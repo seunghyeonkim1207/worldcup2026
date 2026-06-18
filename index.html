@@ -467,9 +467,11 @@ function initFirebase(config) {
       }
     });
 
-    const cb = document.getElementById('conn-bar');
-    cb.style.display = 'flex';
-    document.documentElement.style.setProperty('--hh', (106 + cb.offsetHeight) + 'px');
+    document.getElementById('conn-bar').style.display = 'flex';
+    requestAnimationFrame(() => {
+      const headerH = document.querySelector('.header').offsetHeight;
+      document.documentElement.style.setProperty('--hh', headerH + 'px');
+    });
   } catch(err) {
     console.error('Firebase 초기화 실패:', err);
     setConnStatus('err');
