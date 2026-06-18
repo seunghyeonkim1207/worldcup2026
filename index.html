@@ -203,68 +203,6 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Noto Sans KR',
 <body>
 <div class="app">
 
-  <!-- ── Setup Sheet (Firebase 미설정 시 표시) ── -->
-  <div class="setup-overlay" id="setup-overlay">
-    <div class="setup-sheet">
-      <div class="setup-handle"></div>
-      <div class="setup-title">🔧 배포 설정 (한 번만!)</div>
-      <div class="setup-sub">실시간으로 팀원들이 함께 참여하려면 Firebase 연결이 필요해요. 3분이면 끝납니다.</div>
-
-      <div class="setup-note">
-        <strong>왜 Firebase인가요?</strong><br>
-        팀원 6명이 각자 폰으로 접속해서 예측을 입력하면, 모든 화면에 실시간으로 반영돼요. 무료 플랜으로 충분합니다.
-      </div>
-
-      <div class="setup-step">
-        <div class="step-num">1</div>
-        <div class="step-body">
-          <div class="step-title">Firebase 프로젝트 만들기</div>
-          <div class="step-desc">
-            <a class="step-link" href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a> 접속 →<br>
-            「프로젝트 추가」→ 이름 입력 (예: worldcup2026) → Google 애널리틱스 비활성화 → 프로젝트 만들기
-          </div>
-        </div>
-      </div>
-
-      <div class="setup-step">
-        <div class="step-num">2</div>
-        <div class="step-body">
-          <div class="step-title">Realtime Database 활성화</div>
-          <div class="step-desc">
-            왼쪽 메뉴 「빌드」→「Realtime Database」→ 「데이터베이스 만들기」→<br>
-            위치는 기본값 → <strong>테스트 모드로 시작</strong> 선택 → 사용 설정
-          </div>
-        </div>
-      </div>
-
-      <div class="setup-step">
-        <div class="step-num">3</div>
-        <div class="step-body">
-          <div class="step-title">앱 등록 후 설정 복사</div>
-          <div class="step-desc">
-            프로젝트 개요 → 웹 아이콘 (&#60;/&#62;) 클릭 → 앱 닉네임 입력 → 등록<br>
-            나타나는 <strong>firebaseConfig 객체 전체</strong>를 아래에 붙여넣으세요
-          </div>
-        </div>
-      </div>
-
-      <textarea class="setup-input" id="setup-config" placeholder='아래 형식으로 붙여넣으세요:
-
-const firebaseConfig = {
-  apiKey: "AIza...",
-  authDomain: "...",
-  databaseURL: "https://...",
-  projectId: "...",
-  storageBucket: "...",
-  messagingSenderId: "...",
-  appId: "..."
-};'></textarea>
-
-      <button class="setup-btn" onclick="applyConfig()">연결하고 시작하기 🚀</button>
-      <button class="setup-skip" onclick="skipSetup()">Firebase 없이 로컬로 실행 (혼자 테스트)</button>
-    </div>
-  </div>
-
   <!-- ── Header ── -->
   <div class="header">
     <div class="header-top">
@@ -410,26 +348,6 @@ let gameRef = null;  // Firebase ref (null = 로컬 모드)
 /* ══════════════════════════════════════════
    Firebase 설정
 ══════════════════════════════════════════ */
-function applyConfig() {
-  const raw = document.getElementById('setup-config').value.trim();
-  // firebaseConfig 객체 추출
-  const match = raw.match(/\{[\s\S]*\}/);
-  if (!match) { alert('올바른 firebaseConfig 형식이 아닙니다. 다시 확인해주세요.'); return; }
-  try {
-    const config = eval('(' + match[0] + ')');
-    if (!config.databaseURL) { alert('databaseURL이 없습니다. Firebase 콘솔에서 Realtime Database를 먼저 활성화하세요.'); return; }
-    localStorage.setItem('wc2026_config', JSON.stringify(config));
-    initFirebase(config);
-    document.getElementById('setup-overlay').style.display = 'none';
-  } catch(err) {
-    alert('설정 파싱 오류: ' + err.message);
-  }
-}
-
-function skipSetup() {
-  document.getElementById('setup-overlay').style.display = 'none';
-}
-
 function initFirebase(config) {
   try {
     const app = firebase.initializeApp(config);
@@ -491,18 +409,16 @@ function setConnStatus(state) {
   txt.textContent = s.text;
 }
 
-// 저장된 설정 자동 로드
-(function() {
-  const saved = localStorage.getItem('wc2026_config');
-  if (saved) {
-    try {
-      initFirebase(JSON.parse(saved));
-      document.getElementById('setup-overlay').style.display = 'none';
-    } catch(e) {
-      localStorage.removeItem('wc2026_config');
-    }
-  }
-})();
+// Firebase 자동 시작
+initFirebase({
+  apiKey: "AIzaSyDbJo184QxdtBYcaj1U333ojyd8w2M12DI",
+  authDomain: "worldcup2026-4726d.firebaseapp.com",
+  databaseURL: "https://worldcup2026-4726d-default-rtdb.firebaseio.com",
+  projectId: "worldcup2026-4726d",
+  storageBucket: "worldcup2026-4726d.firebasestorage.app",
+  messagingSenderId: "638020342788",
+  appId: "1:638020342788:web:f49dc1c0374ddd073b5151"
+});
 
 /* ══════════════════════════════════════════
    탭 전환
