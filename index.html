@@ -127,6 +127,12 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Noto Sans KR',
 .sc-colon { font-size:24px; font-weight:600; color:var(--text-faint); padding:0 4px; flex-shrink:0; }
 .save-btn { display:block; width:100%; background:var(--red); color:white; border:none; border-radius:10px; padding:14px; font-size:15px; font-weight:600; cursor:pointer; text-align:center; margin-top:12px; font-family:inherit; -webkit-tap-highlight-color:transparent; }
 .save-btn:active { opacity:.85; }
+.lock-notice { background:#fff8e1; border:0.5px solid #ffe082; border-radius:10px; padding:12px 14px; margin-top:12px; font-size:13px; color:#7a6200; text-align:center; font-weight:600; }
+.card.locked { opacity:0.6; }
+.card.locked .card-hd { cursor:default; }
+.elim { opacity:0.45; filter:grayscale(60%); }
+.elim .lb-name { text-decoration:line-through; }
+.elim-badge { background:#f2f2f7; color:#aaa; font-size:11px; font-weight:700; padding:2px 8px; border-radius:99px; border:0.5px solid #ddd; margin-left:6px; }
 
 /* ── Status ── */
 .pad { padding:14px; }
@@ -441,22 +447,29 @@ function updateProg() {
 }
 
 function renderCards() {
+  const locked = new Date() >= KICKOFF;
   const wrap = document.getElementById('cards');
   wrap.innerHTML = '';
+  if (locked) {
+    const notice = document.createElement('div');
+    notice.style = 'margin:0 0 10px;background:#fff3f3;border:0.5px solid var(--red-mid);border-radius:var(--r-md);padding:11px 14px;font-size:13px;font-weight:600;color:var(--red);text-align:center;';
+    notice.textContent = '🔒 킥오프가 시작됐어요! 예측이 마감됐습니다.';
+    wrap.appendChild(notice);
+  }
   P.forEach((p,i) => {
     const card = document.createElement('div');
-    card.className = 'card'+(openIdx===i?' open':'');
+    card.className = 'card'+(openIdx===i&&!locked?' open':'')+(locked?' locked':'');
     card.id = 'c'+i;
     card.innerHTML = `
-      <div class="card-hd" onclick="toggle(${i})">
+      <div class="card-hd" onclick="${locked?'':'toggle('+i+')'}">
         <div class="em-btn" id="eb${i}">${p.emoji}</div>
         <div class="card-meta">
           <div class="card-name">${e(p.name)}</div>
           ${p.bio ? `<div class="card-bio">${e(p.bio)}</div>` : `<div class="card-bio ph">한마디 남기기...</div>`}
         </div>
         <div class="card-rt">
-          ${p.done ? `<span class="c-score">${p.kor}:${p.mex}</span><span class="c-done">완료</span>` : `<span class="c-pend">미입력</span>`}
-          <span class="chev">▾</span>
+          ${p.done ? `<span class="c-score">${p.kor}:${p.mex}</span><span class="c-done">완료</span>` : `<span class="c-pend">${locked?'미입력':'미입력'}</span>`}
+          ${!locked ? `<span class="chev">▾</span>` : ''}
         </div>
       </div>
       <div class="card-body">
@@ -464,7 +477,7 @@ function renderCards() {
           <div class="sec"><div class="sec-lbl">😄 대표 이모지</div><div class="ep" id="ep${i}"></div></div>
           <div class="sec"><div class="sec-lbl">✍️ 한마디</div>
             <div class="bio-wr">
-              <textarea class="bio-in" id="bio${i}" placeholder="승리를 향한 한마디! (최대 30자)" maxlength="30">${e(p.bio)}</textarea>
+              <textarea class="bio-in" id="bio${i}" placeholder="승리를 향한 한마디! (최대 30자)" maxlength="30" ${locked?'disabled':''}>${e(p.bio)}</textarea>
               <span class="bio-cnt" id="bc${i}">${p.bio.length}/30</span>
             </div>
           </div>
@@ -472,15 +485,17 @@ function renderCards() {
           <div class="sec"><div class="sec-lbl">⚽ 스코어 예측</div>
             <div class="sc-area"><div class="sc-row">
               <div class="sc-blk"><div class="sc-tlbl">🇰🇷 한국</div>
-                <div class="sc-ctrl"><button class="sc-btn" onclick="adj(${i},'kor',-1)">−</button><div class="sc-num" id="k${i}">${p.kor}</div><button class="sc-btn" onclick="adj(${i},'kor',1)">+</button></div>
+                <div class="sc-ctrl"><button class="sc-btn" onclick="adj(${i},'kor',-1)" ${locked?'disabled':''}">−</button><div class="sc-num" id="k${i}">${p.kor}</div><button class="sc-btn" onclick="adj(${i},'kor',1)" ${locked?'disabled':''}">+</button></div>
               </div>
               <span class="sc-colon">:</span>
               <div class="sc-blk"><div class="sc-tlbl">🇲🇽 멕시코</div>
-                <div class="sc-ctrl"><button class="sc-btn" onclick="adj(${i},'mex',-1)">−</button><div class="sc-num" id="m${i}">${p.mex}</div><button class="sc-btn" onclick="adj(${i},'mex',1)">+</button></div>
+                <div class="sc-ctrl"><button class="sc-btn" onclick="adj(${i},'mex',-1)" ${locked?'disabled':''}">−</button><div class="sc-num" id="m${i}">${p.mex}</div><button class="sc-btn" onclick="adj(${i},'mex',1)" ${locked?'disabled':''}">+</button></div>
               </div>
             </div></div>
           </div>
-          <button class="save-btn" onclick="save(${i})">예측 등록 완료 ✓</button>
+          ${locked
+            ? `<div class="lock-notice">🔒 예측이 마감됐어요</div>`
+            : `<button class="save-btn" onclick="save(${i})">예측 등록 완료 ✓</button>`}
         </div>
       </div>`;
     wrap.appendChild(card);
@@ -631,11 +646,23 @@ function renderResult() {
   // 순위표
   const lb=document.getElementById('lb'); lb.innerHTML='';
   const ranks=['🥇','🥈','🥉'], cls=['r1','r2','r3'];
+  const maxPts = scored[0]?.pts || 0;
   scored.forEach((p,ri)=>{
+    const isElim = p.pts === 0 && p.done;
+    const isPerf = p.done && p.kor===actual.kor && p.mex===actual.mex;
     const row=document.createElement('div');
-    row.className='lb-row'+(ri<3?' '+cls[ri]:'');
-    const isPerf=p.done&&p.kor===actual.kor&&p.mex===actual.mex;
-    row.innerHTML=`<div class="lb-rank">${ri<3?ranks[ri]:ri+1}</div><div class="lb-emo">${p.emoji}</div><div class="lb-info"><div class="lb-name">${e(p.name)}</div><div class="lb-pred">${p.done?`예측 ${p.kor}:${p.mex} · ${'★'.repeat(p.conf)}`:'미입력'}</div></div><div class="lb-rt"><div class="lb-pts${isPerf?' perfect':''}">${p.pts}</div><div class="lb-pts-lbl">점</div></div>`;
+    row.className='lb-row'+(isElim?' elim':ri<3?' '+cls[ri]:'');
+    row.innerHTML=`
+      <div class="lb-rank">${isElim?'💀':ri<3?ranks[ri]:ri+1}</div>
+      <div class="lb-emo" style="${isElim?'filter:grayscale(1)':''}">${p.emoji}</div>
+      <div class="lb-info">
+        <div class="lb-name">${e(p.name)}${isElim?'<span class="elim-badge">탈락</span>':''}</div>
+        <div class="lb-pred">${p.done?`예측 ${p.kor}:${p.mex} · ${'★'.repeat(p.conf)}`:'미입력'}</div>
+      </div>
+      <div class="lb-rt">
+        <div class="lb-pts${isPerf?' perfect':''}">${p.pts}</div>
+        <div class="lb-pts-lbl">점</div>
+      </div>`;
     lb.appendChild(row);
   });
 }
