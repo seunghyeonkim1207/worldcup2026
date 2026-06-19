@@ -237,7 +237,10 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Noto Sans KR',
       <div class="hero-band">
         <div class="match-row">
           <div class="m-team"><span class="m-flag">🇰🇷</span><div class="m-name">대한민국</div></div>
-          <div class="m-vs">VS</div>
+          <div style="text-align:center">
+            <div style="font-size:28px;font-weight:800;color:white;letter-spacing:4px;line-height:1">0 : 1</div>
+            <div style="font-size:10px;color:rgba(255,255,255,0.7);margin-top:4px;font-weight:600">🔴 LIVE</div>
+          </div>
           <div class="m-team"><span class="m-flag">🇲🇽</span><div class="m-name">멕시코</div></div>
         </div>
       </div>
@@ -376,13 +379,6 @@ function initFirebase(config) {
         renderSumCards();
         renderAgg();
         updateProg();
-      }
-    });
-
-    // 실제 경기 결과 자동 설정 (멕시코 1 : 한국 0)
-    gameRef.child('result').once('value', snap => {
-      if (!snap.val() || !snap.val().confirmed) {
-        gameRef.child('result').set({kor: 0, mex: 1, confirmed: true});
       }
     });
 
