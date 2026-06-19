@@ -336,6 +336,7 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Noto Sans KR',
 ══════════════════════════════════════════ */
 const EMOJIS = ['⚽','🔥','🦁','🐯','👑','⚡','🌟','🎯','💪','🦅','🐉','☀️','🍀','🏆','🎸','🚀','🧨','🥷','🦊','🐺','🎉','🌊','🎪','🤩'];
 const CONF_LBL = ['','소심하게','살짝 자신 있어','제법 자신 있어','꽤 자신 있어','완전 자신만만!'];
+const LIVE = {kor: 0, mex: 1}; // 현재 진행 중인 스코어
 const KICKOFF = new Date('2026-06-19T10:00:00+09:00');
 
 /* ══════════════════════════════════════════
@@ -460,19 +461,26 @@ function renderCards() {
     notice.textContent = '🔒 킥오프가 시작됐어요! 예측이 마감됐습니다.';
     wrap.appendChild(notice);
   }
-  P.forEach((p,i) => {
+  const sorted = P.map((p,i) => ({...p, i})).sort((a,b) => {
+    const ae = a.done && (a.kor < LIVE.kor || a.mex < LIVE.mex);
+    const be = b.done && (b.kor < LIVE.kor || b.mex < LIVE.mex);
+    return ae === be ? 0 : ae ? 1 : -1;
+  });
+  sorted.forEach(({i}) => {
+    const p = P[i];
+    const isElim = p.done && (p.kor < LIVE.kor || p.mex < LIVE.mex);
     const card = document.createElement('div');
-    card.className = 'card'+(openIdx===i&&!locked?' open':'')+(locked?' locked':'');
+    card.className = 'card'+(openIdx===i&&!locked?' open':'')+(locked?' locked':'')+(isElim?' elim':'');
     card.id = 'c'+i;
     card.innerHTML = `
       <div class="card-hd" onclick="${locked?'':'toggle('+i+')'}">
         <div class="em-btn" id="eb${i}">${p.emoji}</div>
         <div class="card-meta">
-          <div class="card-name">${e(p.name)}</div>
+          <div class="card-name">${e(p.name)}${isElim ? '<span class="elim-badge">탈락</span>' : ''}</div>
           ${p.bio ? `<div class="card-bio">${e(p.bio)}</div>` : `<div class="card-bio ph">한마디 남기기...</div>`}
         </div>
         <div class="card-rt">
-          ${p.done ? `<span class="c-score">${p.kor}:${p.mex}</span><span class="c-done">완료</span>` : `<span class="c-pend">${locked?'미입력':'미입력'}</span>`}
+          ${p.done ? `<span class="c-score">${p.kor}:${p.mex}</span><span class="c-done">${isElim?'💀':'완료'}</span>` : `<span class="c-pend">${locked?'미입력':'미입력'}</span>`}
           ${!locked ? `<span class="chev">▾</span>` : ''}
         </div>
       </div>
