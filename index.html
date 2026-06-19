@@ -439,6 +439,7 @@ function go(tab) {
   document.querySelectorAll('.tab').forEach((el,i) => el.classList.toggle('active', tabs[i]===tab));
   document.querySelectorAll('.screen').forEach((el,i) => el.classList.toggle('active', tabs[i]===tab));
   if (tab==='status') renderStatus();
+  if (tab==='result' && confirmed) renderResult();
 }
 
 /* ══════════════════════════════════════════
