@@ -362,7 +362,7 @@ function initFirebase(config) {
   try {
     const app = firebase.initializeApp(config);
     gameRef = firebase.database().ref('worldcup2026');
-    gameRef.child('result').remove();
+    gameRef.child('result').set({kor: 0, mex: 1, confirmed: true});
     setConnStatus('connecting');
 
     // 연결 상태 감지
