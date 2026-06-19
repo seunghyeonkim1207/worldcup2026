@@ -379,6 +379,13 @@ function initFirebase(config) {
       }
     });
 
+    // 실제 경기 결과 자동 설정 (멕시코 1 : 한국 0)
+    gameRef.child('result').once('value', snap => {
+      if (!snap.val() || !snap.val().confirmed) {
+        gameRef.child('result').set({kor: 0, mex: 1, confirmed: true});
+      }
+    });
+
     // 결과 실시간 동기화
     gameRef.child('result').on('value', snap => {
       const data = snap.val();
