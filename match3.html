@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>2026 서비스제도팀 월드컵 게임</title>
+<title>2026 서비스제도팀 월드컵 게임 - 3차전</title>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
@@ -213,10 +213,10 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Noto Sans KR',
   <div class="header">
     <div class="header-top">
       <div>
-        <div class="header-title">🏆 서비스제도팀 월드컵</div>
-        <div class="header-sub">2026 · 한국 vs 멕시코</div>
+        <div class="header-title">🏆 서비스제도팀 월드컵 3차전</div>
+        <div class="header-sub">2026 · 한국 vs 남아공</div>
       </div>
-      <div class="cd-chip" id="hd-cd">D-1</div>
+      <div class="cd-chip" id="hd-cd">D-2</div>
     </div>
     <div class="tabs">
       <button class="tab active" onclick="go('predict')"><span class="tab-ico">✏️</span>예측</button>
@@ -233,8 +233,8 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Noto Sans KR',
   <div class="content">
 
     <div style="background:var(--surface2);border-bottom:0.5px solid var(--border);padding:10px 18px;display:flex;gap:8px;">
-      <span style="font-size:13px;color:var(--red);font-weight:700;padding:6px 12px;border-radius:8px;background:var(--red-light);border:0.5px solid var(--red-mid);">1차전 한국 vs 멕시코</span>
-      <a href="match3.html" style="font-size:13px;color:var(--text-muted);text-decoration:none;padding:6px 12px;border-radius:8px;background:var(--surface);border:0.5px solid var(--border);">3차전 한국 vs 남아공 →</a>
+      <a href="index.html" style="font-size:13px;color:var(--text-muted);text-decoration:none;padding:6px 12px;border-radius:8px;background:var(--surface);border:0.5px solid var(--border);">← 1차전 한국 vs 멕시코</a>
+      <span style="font-size:13px;color:var(--red);font-weight:700;padding:6px 12px;border-radius:8px;background:var(--red-light);border:0.5px solid var(--red-mid);">3차전 한국 vs 남아공</span>
     </div>
 
     <!-- ── 예측 ── -->
@@ -242,11 +242,8 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Noto Sans KR',
       <div class="hero-band">
         <div class="match-row">
           <div class="m-team"><span class="m-flag">🇰🇷</span><div class="m-name">대한민국</div></div>
-          <div style="text-align:center">
-            <div style="font-size:28px;font-weight:800;color:white;letter-spacing:4px;line-height:1">0 : 1</div>
-            <div style="font-size:10px;color:rgba(255,255,255,0.7);margin-top:4px;font-weight:600">🔴 LIVE</div>
-          </div>
-          <div class="m-team"><span class="m-flag">🇲🇽</span><div class="m-name">멕시코</div></div>
+          <div class="m-vs">VS</div>
+          <div class="m-team"><span class="m-flag">🇿🇦</span><div class="m-name">남아공</div></div>
         </div>
       </div>
       <div class="prog-card">
@@ -274,8 +271,8 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Noto Sans KR',
       <div class="pad">
         <div class="cd-card">
           <div class="cd-left">
-            <div class="cd-match">🇰🇷 한국 vs 멕시코 🇲🇽</div>
-            <div class="cd-date">2026년 6월 19일 금요일</div>
+            <div class="cd-match">🇰🇷 한국 vs 남아공 🇿🇦</div>
+            <div class="cd-date">2026년 6월 25일 목요일</div>
           </div>
           <div class="cd-blocks">
             <div class="cd-block"><div class="cd-val" id="cd-h">00</div><div class="cd-lbl">시간</div></div>
@@ -305,7 +302,7 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Noto Sans KR',
             </div>
             <span class="sc-colon">:</span>
             <div class="act-blk">
-              <div class="act-tlbl">🇲🇽 멕시코</div>
+              <div class="act-tlbl">🇿🇦 남아공</div>
               <div class="sc-ctrl"><button class="sc-btn" onclick="aAdj('mex',-1)">−</button><div class="sc-num" id="act-mex">0</div><button class="sc-btn" onclick="aAdj('mex',1)">+</button></div>
             </div>
           </div>
@@ -341,8 +338,8 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Noto Sans KR',
 ══════════════════════════════════════════ */
 const EMOJIS = ['⚽','🔥','🦁','🐯','👑','⚡','🌟','🎯','💪','🦅','🐉','☀️','🍀','🏆','🎸','🚀','🧨','🥷','🦊','🐺','🎉','🌊','🎪','🤩'];
 const CONF_LBL = ['','소심하게','살짝 자신 있어','제법 자신 있어','꽤 자신 있어','완전 자신만만!'];
-const LIVE = {kor: 0, mex: 1}; // 현재 진행 중인 스코어
-const KICKOFF = new Date('2026-06-19T10:00:00+09:00');
+const LIVE = {kor: 0, mex: 0}; // 현재 진행 중인 스코어
+const KICKOFF = new Date('2026-06-25T10:00:00+09:00');
 
 /* ══════════════════════════════════════════
    상태
@@ -366,8 +363,8 @@ let gameRef = null;  // Firebase ref (null = 로컬 모드)
 function initFirebase(config) {
   try {
     const app = firebase.initializeApp(config);
-    gameRef = firebase.database().ref('worldcup2026');
-    gameRef.child('result').set({kor: 0, mex: 1, confirmed: true});
+    gameRef = firebase.database().ref('worldcup2026_match3');
+    gameRef.child('result').remove();
     setConnStatus('connecting');
 
     // 연결 상태 감지
@@ -506,7 +503,7 @@ function renderCards() {
                 <div class="sc-ctrl"><button class="sc-btn" onclick="adj(${i},'kor',-1)" ${locked?'disabled':''}">−</button><div class="sc-num" id="k${i}">${p.kor}</div><button class="sc-btn" onclick="adj(${i},'kor',1)" ${locked?'disabled':''}">+</button></div>
               </div>
               <span class="sc-colon">:</span>
-              <div class="sc-blk"><div class="sc-tlbl">🇲🇽 멕시코</div>
+              <div class="sc-blk"><div class="sc-tlbl">🇿🇦 남아공</div>
                 <div class="sc-ctrl"><button class="sc-btn" onclick="adj(${i},'mex',-1)" ${locked?'disabled':''}">−</button><div class="sc-num" id="m${i}">${p.mex}</div><button class="sc-btn" onclick="adj(${i},'mex',1)" ${locked?'disabled':''}">+</button></div>
               </div>
             </div></div>
@@ -602,8 +599,8 @@ function renderAgg() {
   bars.innerHTML=`
     <div class="agg-row"><div class="agg-team">🇰🇷 한국 승</div><div class="agg-bar-wr"><div class="agg-fill fill-kor" style="width:${kw/n*100}%"></div></div><div class="agg-n">${kw}명</div></div>
     <div class="agg-row"><div class="agg-team">🤝 무승부</div><div class="agg-bar-wr"><div class="agg-fill fill-draw" style="width:${dr/n*100}%"></div></div><div class="agg-n">${dr}명</div></div>
-    <div class="agg-row"><div class="agg-team">🇲🇽 멕시코 승</div><div class="agg-bar-wr"><div class="agg-fill fill-mex" style="width:${mw/n*100}%"></div></div><div class="agg-n">${mw}명</div></div>`;
-  avg.innerHTML=`<div><div class="avg-val">🇰🇷 ${ak}</div><div class="avg-lbl">한국 평균 예측</div></div><div><div class="avg-val">${am} 🇲🇽</div><div class="avg-lbl">멕시코 평균 예측</div></div>`;
+    <div class="agg-row"><div class="agg-team">🇿🇦 남아공 승</div><div class="agg-bar-wr"><div class="agg-fill fill-mex" style="width:${mw/n*100}%"></div></div><div class="agg-n">${mw}명</div></div>`;
+  avg.innerHTML=`<div><div class="avg-val">🇰🇷 ${ak}</div><div class="avg-lbl">한국 평균 예측</div></div><div><div class="avg-val">${am} 🇿🇦</div><div class="avg-lbl">남아공 평균 예측</div></div>`;
 }
 
 function renderSumCards() {
