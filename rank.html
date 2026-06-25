@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>2026 서비스제도팀 월드컵 - 조3위 순위 예측</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --red:#C8102E; --red-light:rgba(200,16,46,0.1); --red-mid:#F09595;
+  --gold:#FFB800; --silver:#A8A8A8; --bronze:#C87A3D;
+  --bg:#f2f2f7; --surface:#fff; --surface2:#f7f7f7;
+  --border:rgba(0,0,0,0.09); --border-strong:rgba(0,0,0,0.16);
+  --text:#1a1a1a; --text-muted:#666; --text-faint:#aaa;
+  --r-md:12px; --r-lg:16px;
+  --hh:96px;
+}
+@media (prefers-color-scheme:dark) {
+  :root { --bg:#1c1c1e; --surface:#2c2c2e; --surface2:#3a3a3c; --border:rgba(255,255,255,0.09); --border-strong:rgba(255,255,255,0.18); --text:#f5f5f5; --text-muted:#ababab; --text-faint:#555; }
+}
+body { font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Noto Sans KR',sans-serif; background:var(--bg); min-height:100vh; -webkit-font-smoothing:antialiased; }
+.app { max-width:430px; margin:0 auto; }
+
+.header { position:fixed; top:0; left:50%; transform:translateX(-50%); width:100%; max-width:430px; z-index:100; background:var(--red); }
+.header-top { padding:14px 18px 10px; display:flex; align-items:center; justify-content:space-between; }
+.header-title { font-size:15px; font-weight:700; color:white; }
+.header-sub { font-size:11px; color:rgba(255,255,255,0.6); margin-top:1px; }
+.tabs { display:flex; background:rgba(0,0,0,0.15); }
+.tab { flex:1; padding:9px 4px 8px; background:transparent; border:none; font-family:inherit; font-size:11px; font-weight:600; color:rgba(255,255,255,0.5); cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:2px; transition:color .15s,background .15s; -webkit-tap-highlight-color:transparent; }
+.tab.active { color:white; background:rgba(255,255,255,0.12); }
+.tab-ico { font-size:16px; }
+
+.content { padding-top:var(--hh); padding-bottom:40px; }
+.screen { display:none; }
+.screen.active { display:block; }
+
+.nav-bar { background:var(--surface2); border-bottom:0.5px solid var(--border); padding:8px 12px; display:flex; gap:6px; overflow-x:auto; }
+.nav-bar::-webkit-scrollbar { display:none; }
+.nav-link { font-size:11px; color:var(--text-muted); text-decoration:none; padding:5px 10px; border-radius:8px; background:var(--surface); border:0.5px solid var(--border); white-space:nowrap; flex-shrink:0; }
+.nav-link.active { color:var(--red); font-weight:700; background:var(--red-light); border-color:var(--red-mid); }
+
+.hero-band { background:var(--red); padding:16px 18px 20px; }
+.hero-title { font-size:18px; font-weight:800; color:white; text-align:center; margin-bottom:6px; }
+.hero-sub { font-size:12px; color:rgba(255,255,255,0.7); text-align:center; line-height:1.6; }
+.hero-badge { display:inline-block; background:rgba(255,255,255,0.15); border-radius:99px; padding:4px 12px; font-size:12px; font-weight:700; color:white; margin-top:8px; }
+
+.prog-card { background:var(--surface); border-radius:var(--r-lg); border:0.5px solid var(--border); padding:14px 16px; margin:12px 14px; display:flex; align-items:center; gap:14px; }
+.prog-label { font-size:12px; font-weight:700; color:var(--text); margin-bottom:7px; }
+.prog-bar { height:5px; background:var(--surface2); border-radius:99px; overflow:hidden; }
+.prog-fill { height:100%; background:var(--red); border-radius:99px; transition:width .4s ease; width:0%; }
+.prog-num { font-size:26px; font-weight:800; color:var(--red); white-space:nowrap; line-height:1; }
+.prog-den { font-size:11px; color:var(--text-muted); }
+
+.done-banner { margin:0 14px 12px; background:var(--red); border-radius:var(--r-lg); padding:20px; text-align:center; color:white; display:none; }
+.done-banner .emo { font-size:36px; margin-bottom:8px; }
+.done-banner .ttl { font-size:17px; font-weight:700; margin-bottom:4px; }
+.done-banner .sub { font-size:12px; opacity:.75; }
+
+.cards { padding:0 14px; display:flex; flex-direction:column; gap:8px; }
+.card { background:var(--surface); border:0.5px solid var(--border); border-radius:var(--r-lg); overflow:hidden; transition:border-color .2s,box-shadow .2s; }
+.card.open { border-color:var(--red); box-shadow:0 2px 16px rgba(200,16,46,0.1); }
+.card-hd { display:flex; align-items:center; gap:12px; padding:13px 14px; cursor:pointer; user-select:none; -webkit-tap-highlight-color:transparent; }
+.em-btn { width:44px; height:44px; border-radius:12px; background:var(--surface2); border:0.5px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:24px; flex-shrink:0; }
+.card.open .em-btn { background:var(--red-light); border-color:var(--red-mid); }
+.card-meta { flex:1; min-width:0; }
+.card-name { font-size:15px; font-weight:600; color:var(--text); }
+.card-bio { font-size:12px; color:var(--text-muted); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:180px; }
+.card-bio.ph { color:var(--text-faint); }
+.card-rt { display:flex; align-items:center; gap:6px; flex-shrink:0; }
+.c-rank { font-size:18px; font-weight:700; color:var(--red); }
+.c-pend { font-size:12px; color:var(--text-faint); }
+.c-done { background:var(--red-light); color:var(--red); font-size:10px; font-weight:700; padding:2px 7px; border-radius:99px; }
+.chev { font-size:11px; color:var(--text-faint); transition:transform .25s; }
+.card.open .chev { transform:rotate(180deg); }
+.card.locked { opacity:0.6; }
+.card.locked .card-hd { cursor:default; }
+
+.card-body { max-height:0; overflow:hidden; transition:max-height .35s cubic-bezier(.4,0,.2,1); }
+.card.open .card-body { max-height:600px; }
+.card-inner { padding:0 14px 16px; border-top:0.5px solid var(--border); }
+.sec { margin-top:14px; }
+.sec-lbl { font-size:11px; font-weight:600; color:var(--text-muted); letter-spacing:.5px; margin-bottom:8px; }
+
+.rank-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+.rank-btn { height:52px; border-radius:10px; background:var(--surface2); border:0.5px solid var(--border); display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; -webkit-tap-highlight-color:transparent; transition:transform .1s; }
+.rank-btn:active { transform:scale(.9); }
+.rank-btn.on { background:var(--red-light); border:1.5px solid var(--red); }
+.rank-num { font-size:20px; font-weight:800; color:var(--text); line-height:1; }
+.rank-btn.on .rank-num { color:var(--red); }
+.rank-sfx { font-size:10px; color:var(--text-faint); margin-top:2px; }
+.rank-btn.on .rank-sfx { color:var(--red-mid); }
+
+.bio-wr { position:relative; }
+.bio-in { width:100%; border:0.5px solid var(--border-strong); border-radius:10px; padding:10px 38px 10px 12px; font-size:14px; font-family:inherit; color:var(--text); background:var(--surface2); resize:none; height:50px; line-height:1.5; -webkit-appearance:none; }
+.bio-in:focus { outline:none; border-color:var(--red); background:var(--surface); }
+.bio-in::placeholder { color:var(--text-faint); }
+.bio-cnt { position:absolute; right:10px; bottom:9px; font-size:10px; color:var(--text-faint); }
+.stars { display:flex; align-items:center; gap:5px; }
+.star { font-size:26px; cursor:pointer; opacity:.2; transition:opacity .1s,transform .1s; -webkit-tap-highlight-color:transparent; line-height:1; }
+.star.on { opacity:1; }
+.star:active { transform:scale(.85); }
+.star-lbl { font-size:12px; color:var(--text-muted); margin-left:4px; }
+
+.save-btn { display:block; width:100%; background:var(--red); color:white; border:none; border-radius:10px; padding:14px; font-size:15px; font-weight:600; cursor:pointer; text-align:center; margin-top:12px; font-family:inherit; -webkit-tap-highlight-color:transparent; }
+.save-btn:active { opacity:.85; }
+.lock-notice { background:#fff8e1; border:0.5px solid #ffe082; border-radius:10px; padding:12px 14px; margin-top:12px; font-size:13px; color:#7a6200; text-align:center; font-weight:600; }
+
+.pad { padding:14px; }
+.slabel { font-size:11px; font-weight:700; color:var(--text-muted); letter-spacing:.8px; text-transform:uppercase; margin-bottom:8px; }
+
+.sum-cards { display:flex; flex-direction:column; gap:8px; }
+.sum-card { background:var(--surface); border-radius:var(--r-md); border:0.5px solid var(--border); padding:12px 14px; display:flex; align-items:center; gap:12px; }
+.sum-emo { font-size:28px; flex-shrink:0; }
+.sum-info { flex:1; min-width:0; }
+.sum-name { font-size:14px; font-weight:600; color:var(--text); }
+.sum-bio { font-size:12px; color:var(--text-muted); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.sum-rt { text-align:right; flex-shrink:0; }
+.sum-rank { font-size:22px; font-weight:700; color:var(--red); }
+.sum-conf { font-size:11px; color:var(--text-faint); margin-top:2px; }
+.sum-pend { font-size:13px; color:var(--text-faint); }
+
+.agg-card { background:var(--surface); border-radius:var(--r-lg); border:0.5px solid var(--border); padding:16px; margin-bottom:12px; }
+.agg-ttl { font-size:13px; font-weight:700; color:var(--text); margin-bottom:14px; }
+.rank-dist { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; }
+.dist-cell { background:var(--surface2); border-radius:8px; padding:8px 4px; text-align:center; }
+.dist-rank { font-size:13px; font-weight:700; color:var(--text); }
+.dist-bar-wr { height:40px; display:flex; align-items:flex-end; justify-content:center; margin:4px 0; }
+.dist-bar { width:20px; background:var(--red); border-radius:4px 4px 0 0; transition:height .4s ease; min-height:2px; }
+.dist-n { font-size:11px; color:var(--text-muted); }
+
+.act-card { background:var(--surface); border-radius:var(--r-lg); border:0.5px solid var(--border); padding:18px 16px; margin-bottom:12px; }
+.act-ttl { font-size:13px; font-weight:700; color:var(--text); margin-bottom:14px; }
+.act-rank-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:16px; }
+.act-rank-btn { height:56px; border-radius:10px; background:var(--surface2); border:0.5px solid var(--border); display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+.act-rank-btn.on { background:var(--red-light); border:1.5px solid var(--red); }
+.act-rank-btn .rank-num { font-size:22px; font-weight:800; color:var(--text); }
+.act-rank-btn.on .rank-num { color:var(--red); }
+.act-btn { display:block; width:100%; background:#1a1a1a; color:white; border:none; border-radius:10px; padding:13px; font-size:14px; font-weight:700; cursor:pointer; font-family:inherit; }
+@media (prefers-color-scheme:dark) { .act-btn { background:#f5f5f5; color:#1a1a1a; } }
+
+.lb { display:flex; flex-direction:column; gap:8px; margin-bottom:12px; }
+.lb-row { background:var(--surface); border-radius:var(--r-md); border:0.5px solid var(--border); padding:12px 14px; display:flex; align-items:center; gap:10px; }
+.lb-row.r1 { border-color:var(--gold); box-shadow:0 2px 12px rgba(255,184,0,0.12); }
+.lb-row.r2 { border-color:var(--silver); }
+.lb-row.r3 { border-color:var(--bronze); }
+.lb-rank { font-size:22px; min-width:28px; text-align:center; }
+.lb-emo { font-size:26px; flex-shrink:0; }
+.lb-info { flex:1; min-width:0; }
+.lb-name { font-size:14px; font-weight:600; color:var(--text); }
+.lb-pred { font-size:12px; color:var(--text-muted); margin-top:2px; }
+.lb-rt { text-align:right; flex-shrink:0; }
+.lb-pts { font-size:22px; font-weight:800; color:var(--text); line-height:1; }
+.lb-pts.perfect { color:var(--gold); }
+.lb-pts-lbl { font-size:10px; color:var(--text-muted); margin-top:1px; }
+
+.conn-bar { background:var(--surface2); padding:10px 18px; display:flex; align-items:center; gap:8px; }
+.conn-dot { width:8px; height:8px; border-radius:50%; background:var(--text-faint); flex-shrink:0; }
+.conn-dot.live { background:#34C759; }
+.conn-dot.err { background:var(--red); }
+.conn-txt { font-size:12px; color:var(--text-muted); }
+.mt12 { margin-top:12px; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="header">
+    <div class="header-top">
+      <div>
+        <div class="header-title">🏆 서비스제도팀 월드컵</div>
+        <div class="header-sub">대한민국 조3위 32강 진출 순위 예측</div>
+      </div>
+    </div>
+    <div class="tabs">
+      <button class="tab active" onclick="go('predict')"><span class="tab-ico">✏️</span>예측</button>
+      <button class="tab" onclick="go('status')"><span class="tab-ico">📊</span>현황</button>
+      <button class="tab" onclick="go('result')"><span class="tab-ico">🏆</span>결과</button>
+    </div>
+    <div class="conn-bar" id="conn-bar" style="display:none">
+      <div class="conn-dot" id="conn-dot"></div>
+      <span class="conn-txt" id="conn-txt">연결 중...</span>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <div class="nav-bar">
+      <a href="index.html" class="nav-link">2차전 vs 멕시코</a>
+      <a href="match3.html" class="nav-link">3차전 vs 남아공</a>
+      <span class="nav-link active">🇰🇷 조3위 순위</span>
+    </div>
+
+    <!-- ── 예측 ── -->
+    <div class="screen active" id="screen-predict">
+      <div class="hero-band">
+        <div class="hero-title">🇰🇷 조3위 32강 진출</div>
+        <div class="hero-sub">12개 조 3위팀 중 상위 8팀이 32강 진출<br>한국은 몇 번째로 진출할까요?</div>
+        <div style="text-align:center"><div class="hero-badge">1위 ~ 8위 중 예측</div></div>
+      </div>
+      <div class="prog-card">
+        <div style="flex:1">
+          <div class="prog-label">팀원 예측 현황</div>
+          <div class="prog-bar"><div class="prog-fill" id="prog-fill"></div></div>
+        </div>
+        <div style="text-align:right">
+          <div class="prog-num" id="prog-n">0</div>
+          <div class="prog-den">/ 6명 완료</div>
+        </div>
+      </div>
+      <div class="done-banner" id="done-banner">
+        <div class="emo">🎉</div>
+        <div class="ttl">전원 예측 완료!</div>
+        <div class="sub">6명 모두 예측을 등록했어요!</div>
+      </div>
+      <div class="cards" id="cards"></div>
+      <div style="height:8px"></div>
+    </div>
+
+    <!-- ── 현황 ── -->
+    <div class="screen" id="screen-status">
+      <div class="pad">
+        <div class="agg-card">
+          <div class="agg-ttl">📊 순위 예측 분포</div>
+          <div class="rank-dist" id="rank-dist"></div>
+        </div>
+        <div class="slabel">팀원 예측 카드</div>
+        <div class="sum-cards" id="sum-cards"></div>
+      </div>
+    </div>
+
+    <!-- ── 결과 ── -->
+    <div class="screen" id="screen-result">
+      <div class="pad">
+        <div class="act-card">
+          <div class="act-ttl">🏁 실제 한국 조3위 순위 입력</div>
+          <div class="act-rank-grid" id="act-rank-grid"></div>
+          <button class="act-btn" onclick="confirmResult()">결과 확정 · 순위 발표 🎯</button>
+        </div>
+        <div id="result-out" style="display:none">
+          <div class="slabel mt12">🏅 최종 순위</div>
+          <div class="lb" id="lb"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<script>
+const CONF_LBL = ['','소심하게','살짝 자신 있어','제법 자신 있어','꽤 자신 있어','완전 자신만만!'];
+const KICKOFF = new Date('2026-06-29T00:00:00+09:00'); // 조별리그 종료 후 마감
+
+const P = [
+  {name:'임채원', emoji:'⚽', bio:'', rank:0, conf:3, done:false},
+  {name:'윤석',   emoji:'🔥', bio:'', rank:0, conf:3, done:false},
+  {name:'채종현', emoji:'🦁', bio:'', rank:0, conf:3, done:false},
+  {name:'김승찬', emoji:'🐯', bio:'', rank:0, conf:3, done:false},
+  {name:'김필수', emoji:'👑', bio:'', rank:0, conf:3, done:false},
+  {name:'김승현', emoji:'⚡', bio:'', rank:0, conf:3, done:false},
+];
+let openIdx = -1;
+let actualRank = 0;
+let confirmed = false;
+let gameRef = null;
+
+function initFirebase(config) {
+  try {
+    firebase.initializeApp(config);
+    gameRef = firebase.database().ref('worldcup2026_rank');
+    setConnStatus('connecting');
+
+    firebase.database().ref('.info/connected').on('value', snap => {
+      setConnStatus(snap.val() ? 'live' : 'err');
+    });
+
+    gameRef.child('players').on('value', snap => {
+      const data = snap.val();
+      if (data) {
+        Object.keys(data).forEach(i => { if (P[i]) Object.assign(P[i], data[i]); });
+        renderCards(); renderSumCards(); renderDist(); updateProg();
+      }
+    });
+
+    gameRef.child('result').on('value', snap => {
+      const data = snap.val();
+      if (data && data.confirmed) {
+        actualRank = data.rank;
+        confirmed = true;
+        setActRank(actualRank);
+        renderResult();
+      }
+    });
+
+    document.getElementById('conn-bar').style.display = 'flex';
+    requestAnimationFrame(() => {
+      const h = document.querySelector('.header').offsetHeight;
+      document.documentElement.style.setProperty('--hh', h + 'px');
+    });
+  } catch(err) {
+    console.error(err);
+    setConnStatus('err');
+  }
+}
+
+function setConnStatus(state) {
+  const dot = document.getElementById('conn-dot'), txt = document.getElementById('conn-txt');
+  const s = {connecting:{cls:'',text:'서버 연결 중...'},live:{cls:'live',text:'실시간 연결됨'},err:{cls:'err',text:'연결 오류'}}[state];
+  dot.className = 'conn-dot ' + s.cls; txt.textContent = s.text;
+}
+
+initFirebase({
+  apiKey: "AIzaSyDbJo184QxdtBYcaj1U333ojyd8w2M12DI",
+  authDomain: "worldcup2026-4726d.firebaseapp.com",
+  databaseURL: "https://worldcup2026-4726d-default-rtdb.firebaseio.com",
+  projectId: "worldcup2026-4726d",
+  storageBucket: "worldcup2026-4726d.firebasestorage.app",
+  messagingSenderId: "638020342788",
+  appId: "1:638020342788:web:f49dc1c0374ddd073b5151"
+});
+
+function go(tab) {
+  const tabs = ['predict','status','result'];
+  document.querySelectorAll('.tab').forEach((el,i) => el.classList.toggle('active', tabs[i]===tab));
+  document.querySelectorAll('.screen').forEach((el,i) => el.classList.toggle('active', tabs[i]===tab));
+  if (tab==='status') { renderDist(); renderSumCards(); }
+  if (tab==='result') { renderActGrid(); if (confirmed) renderResult(); }
+}
+
+function updateProg() {
+  const n = P.filter(p=>p.done).length;
+  document.getElementById('prog-n').textContent = n;
+  document.getElementById('prog-fill').style.width = (n/P.length*100)+'%';
+  document.getElementById('done-banner').style.display = n===P.length ? 'block' : 'none';
+}
+
+function renderCards() {
+  const locked = new Date() >= KICKOFF;
+  const wrap = document.getElementById('cards');
+  wrap.innerHTML = '';
+  if (locked) {
+    const notice = document.createElement('div');
+    notice.style = 'margin:0 0 10px;background:#fff3f3;border:0.5px solid var(--red-mid);border-radius:var(--r-md);padding:11px 14px;font-size:13px;font-weight:600;color:var(--red);text-align:center;';
+    notice.textContent = '🔒 예측이 마감됐습니다.';
+    wrap.appendChild(notice);
+  }
+  P.forEach((p,i) => {
+    const card = document.createElement('div');
+    card.className = 'card'+(openIdx===i&&!locked?' open':'')+(locked?' locked':'');
+    card.id = 'c'+i;
+    card.innerHTML = `
+      <div class="card-hd" onclick="${locked?'':'toggle('+i+')'}">
+        <div class="em-btn">${p.emoji}</div>
+        <div class="card-meta">
+          <div class="card-name">${e(p.name)}</div>
+          ${p.bio ? `<div class="card-bio">${e(p.bio)}</div>` : `<div class="card-bio ph">한마디 남기기...</div>`}
+        </div>
+        <div class="card-rt">
+          ${p.done ? `<span class="c-rank">${p.rank}위</span><span class="c-done">완료</span>` : `<span class="c-pend">미입력</span>`}
+          ${!locked ? `<span class="chev">▾</span>` : ''}
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-inner">
+          <div class="sec">
+            <div class="sec-lbl">🇰🇷 한국의 조3위 순위 예측</div>
+            <div class="rank-grid" id="rg${i}"></div>
+          </div>
+          <div class="sec"><div class="sec-lbl">✍️ 한마디</div>
+            <div class="bio-wr">
+              <textarea class="bio-in" id="bio${i}" placeholder="한마디! (최대 30자)" maxlength="30" ${locked?'disabled':''}>${e(p.bio)}</textarea>
+              <span class="bio-cnt" id="bc${i}">${p.bio.length}/30</span>
+            </div>
+          </div>
+          <div class="sec"><div class="sec-lbl">🔥 자신감 지수</div><div class="stars" id="st${i}"></div></div>
+          ${locked
+            ? `<div class="lock-notice">🔒 예측이 마감됐어요</div>`
+            : `<button class="save-btn" onclick="save(${i})">예측 등록 완료 ✓</button>`}
+        </div>
+      </div>`;
+    wrap.appendChild(card);
+
+    // 순위 버튼 1~8
+    const rg = document.getElementById('rg'+i);
+    for (let r=1; r<=8; r++) {
+      const btn = document.createElement('div');
+      btn.className = 'rank-btn'+(p.rank===r?' on':'');
+      btn.innerHTML = `<div class="rank-num">${r}</div><div class="rank-sfx">위</div>`;
+      btn.onclick = ev => {
+        ev.stopPropagation();
+        if (locked) return;
+        P[i].rank = r;
+        rg.querySelectorAll('.rank-btn').forEach((b,idx) => b.classList.toggle('on', idx===r-1));
+      };
+      rg.appendChild(btn);
+    }
+
+    // 한마디
+    const bio = document.getElementById('bio'+i);
+    if (bio) bio.oninput = function(){ P[i].bio=this.value; document.getElementById('bc'+i).textContent=this.value.length+'/30'; };
+
+    // 자신감 별점
+    const sw = document.getElementById('st'+i);
+    for (let s=1; s<=5; s++) {
+      const star = document.createElement('span');
+      star.className = 'star'+(s<=p.conf?' on':'');
+      star.textContent = '★';
+      star.onclick = ev => { ev.stopPropagation(); P[i].conf=s; sw.querySelectorAll('.star').forEach((el,idx)=>el.classList.toggle('on',idx<s)); const l=sw.querySelector('.star-lbl'); if(l)l.textContent=CONF_LBL[s]; };
+      sw.appendChild(star);
+    }
+    const lbl = document.createElement('span'); lbl.className='star-lbl'; lbl.textContent=CONF_LBL[p.conf]; sw.appendChild(lbl);
+  });
+  updateProg();
+}
+
+function toggle(i) {
+  openIdx = openIdx===i ? -1 : i;
+  renderCards();
+  if (openIdx===i) setTimeout(()=>{ const el=document.getElementById('c'+i); if(el)el.scrollIntoView({behavior:'smooth',block:'nearest'}); },50);
+}
+
+function save(i) {
+  if (!P[i].rank) { alert('순위를 선택해주세요!'); return; }
+  const bio = document.getElementById('bio'+i); if(bio) P[i].bio=bio.value;
+  P[i].done = true;
+  if (gameRef) {
+    gameRef.child('players').child(i).set({
+      emoji:P[i].emoji, bio:P[i].bio, rank:P[i].rank, conf:P[i].conf, done:true
+    });
+  }
+  openIdx = -1;
+  const next = P.findIndex((p,idx)=>idx>i&&!p.done);
+  if (next!==-1) openIdx=next;
+  renderCards();
+  if (openIdx!==-1) setTimeout(()=>{ const el=document.getElementById('c'+openIdx); if(el)el.scrollIntoView({behavior:'smooth',block:'nearest'}); },100);
+}
+
+function renderDist() {
+  const wrap = document.getElementById('rank-dist'); wrap.innerHTML='';
+  const counts = Array(8).fill(0);
+  P.filter(p=>p.done).forEach(p => { if(p.rank>=1&&p.rank<=8) counts[p.rank-1]++; });
+  const max = Math.max(...counts, 1);
+  for (let r=1; r<=8; r++) {
+    const n = counts[r-1];
+    const h = Math.round((n/max)*36)+2;
+    const cell = document.createElement('div'); cell.className='dist-cell';
+    cell.innerHTML=`<div class="dist-rank">${r}위</div><div class="dist-bar-wr"><div class="dist-bar" style="height:${h}px"></div></div><div class="dist-n">${n}명</div>`;
+    wrap.appendChild(cell);
+  }
+}
+
+function renderSumCards() {
+  const wrap = document.getElementById('sum-cards'); wrap.innerHTML='';
+  P.forEach(p => {
+    const d = document.createElement('div'); d.className='sum-card';
+    d.innerHTML=`<div class="sum-emo">${p.emoji}</div><div class="sum-info"><div class="sum-name">${e(p.name)}</div>${p.bio?`<div class="sum-bio">"${e(p.bio)}"</div>`:''}</div><div class="sum-rt">${p.done?`<div class="sum-rank">${p.rank}위</div><div class="sum-conf">${'★'.repeat(p.conf)+'☆'.repeat(5-p.conf)}</div>`:'<div class="sum-pend">미입력</div>'}</div>`;
+    wrap.appendChild(d);
+  });
+}
+
+function renderActGrid() {
+  const wrap = document.getElementById('act-rank-grid'); if(wrap.children.length) return;
+  for (let r=1; r<=8; r++) {
+    const btn = document.createElement('div'); btn.className='act-rank-btn'; btn.id='ar'+r;
+    btn.innerHTML=`<div class="rank-num">${r}</div><div class="rank-sfx" style="font-size:10px;color:var(--text-faint)">위</div>`;
+    btn.onclick = () => setActRank(r);
+    wrap.appendChild(btn);
+  }
+}
+
+function setActRank(r) {
+  actualRank = r;
+  document.querySelectorAll('.act-rank-btn').forEach((b,i)=>b.classList.toggle('on',i===r-1));
+}
+
+function confirmResult() {
+  if (!actualRank) { alert('실제 순위를 선택해주세요!'); return; }
+  confirmed = true;
+  if (gameRef) gameRef.child('result').set({rank:actualRank, confirmed:true});
+  renderResult();
+}
+
+function calcPts(p) {
+  if (!p.done || !p.rank) return 0;
+  const diff = Math.abs(p.rank - actualRank);
+  if (diff === 0) return 10 + (p.conf===5?3:p.conf===4?1:0);
+  if (diff === 1) return 5 + (p.conf===5?1:0);
+  if (diff === 2) return 2;
+  return 0;
+}
+
+function renderResult() {
+  document.getElementById('result-out').style.display = 'block';
+  const scored = P.map((p,i)=>({...p,pts:calcPts(p),i})).sort((a,b)=>b.pts-a.pts);
+  const lb = document.getElementById('lb'); lb.innerHTML='';
+  const ranks=['🥇','🥈','🥉'], cls=['r1','r2','r3'];
+  scored.forEach((p,ri) => {
+    const isPerf = p.done && p.rank===actualRank;
+    const row = document.createElement('div');
+    row.className = 'lb-row'+(ri<3?' '+cls[ri]:'');
+    row.innerHTML=`
+      <div class="lb-rank">${ri<3?ranks[ri]:ri+1}</div>
+      <div style="font-size:26px;flex-shrink:0">${p.emoji}</div>
+      <div class="lb-info">
+        <div class="lb-name">${e(p.name)}</div>
+        <div class="lb-pred">${p.done?`예측 ${p.rank}위 · ${'★'.repeat(p.conf)}`:'미입력'}</div>
+      </div>
+      <div class="lb-rt">
+        <div class="lb-pts${isPerf?' perfect':''}">${p.pts}</div>
+        <div class="lb-pts-lbl">점</div>
+      </div>`;
+    lb.appendChild(row);
+  });
+}
+
+function e(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+renderCards();
+</script>
+</body>
+</html>
