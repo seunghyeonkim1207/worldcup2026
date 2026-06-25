@@ -89,6 +89,8 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Noto Sans KR',
 .rank-btn.on .rank-num { color:var(--red); }
 .rank-sfx { font-size:10px; color:var(--text-faint); margin-top:2px; }
 .rank-btn.on .rank-sfx { color:var(--red-mid); }
+.rank-btn.taken { opacity:0.3; cursor:not-allowed; }
+.rank-btn.taken .rank-sfx { font-size:9px; color:var(--text-faint); }
 
 .bio-wr { position:relative; }
 .bio-in { width:100%; border:0.5px solid var(--border-strong); border-radius:10px; padding:10px 38px 10px 12px; font-size:14px; font-family:inherit; color:var(--text); background:var(--surface2); resize:none; height:50px; line-height:1.5; -webkit-appearance:none; }
@@ -380,15 +382,17 @@ function renderCards() {
       </div>`;
     wrap.appendChild(card);
 
-    // 순위 버튼 1~8
+    // 순위 버튼 1~12 (다른 사람이 선택한 순위는 비활성화)
+    const takenRanks = new Set(P.filter((_,j) => j!==i && P[j].rank>0).map(p2 => p2.rank));
     const rg = document.getElementById('rg'+i);
     for (let r=1; r<=12; r++) {
+      const isTaken = takenRanks.has(r) && p.rank!==r;
       const btn = document.createElement('div');
-      btn.className = 'rank-btn'+(p.rank===r?' on':'');
-      btn.innerHTML = `<div class="rank-num">${r}</div><div class="rank-sfx">위</div>`;
+      btn.className = 'rank-btn'+(p.rank===r?' on':isTaken?' taken':'');
+      btn.innerHTML = `<div class="rank-num">${r}</div><div class="rank-sfx">${isTaken?'선택됨':'위'}</div>`;
       btn.onclick = ev => {
         ev.stopPropagation();
-        if (locked) return;
+        if (locked || isTaken) return;
         P[i].rank = r;
         rg.querySelectorAll('.rank-btn').forEach((b,idx) => b.classList.toggle('on', idx===r-1));
       };
