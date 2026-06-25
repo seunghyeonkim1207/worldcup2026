@@ -359,7 +359,8 @@ function renderCards() {
         </div>
         <div class="card-rt">
           ${p.done ? `<span class="c-rank">${p.rank}위</span><span class="c-done">완료</span>` : `<span class="c-pend">미입력</span>`}
-          ${!locked ? `<span class="chev">▾</span>` : ''}
+          ${!locked && p.done ? `<span onclick="event.stopPropagation();cancel(${i})" style="font-size:11px;color:var(--text-faint);padding:3px 7px;border-radius:6px;border:0.5px solid var(--border);cursor:pointer;margin-left:2px">취소</span>` : ''}
+          ${!locked && !p.done ? `<span class="chev">▾</span>` : ''}
         </div>
       </div>
       <div class="card-body">
@@ -421,6 +422,15 @@ function toggle(i) {
   openIdx = openIdx===i ? -1 : i;
   renderCards();
   if (openIdx===i) setTimeout(()=>{ const el=document.getElementById('c'+i); if(el)el.scrollIntoView({behavior:'smooth',block:'nearest'}); },50);
+}
+
+function cancel(i) {
+  P[i].done = false;
+  P[i].rank = 0;
+  if (gameRef) gameRef.child('players').child(i).set({emoji:P[i].emoji, bio:P[i].bio, rank:0, conf:P[i].conf, done:false});
+  openIdx = i;
+  renderCards();
+  setTimeout(()=>{ const el=document.getElementById('c'+i); if(el)el.scrollIntoView({behavior:'smooth',block:'nearest'}); },50);
 }
 
 function save(i) {
