@@ -195,7 +195,7 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Noto Sans KR',
       <div class="hero-band">
         <div class="hero-title">🇰🇷 조3위 32강 진출</div>
         <div class="hero-sub">12개 조 3위팀 중 상위 8팀이 32강 진출<br>한국은 몇 번째로 진출할까요?</div>
-        <div style="text-align:center"><div class="hero-badge">1위 ~ 8위 중 예측</div></div>
+        <div style="text-align:center"><div class="hero-badge">1위 ~ 12위 중 예측</div></div>
       </div>
       <div class="prog-card">
         <div style="flex:1">
@@ -382,7 +382,7 @@ function renderCards() {
 
     // 순위 버튼 1~8
     const rg = document.getElementById('rg'+i);
-    for (let r=1; r<=8; r++) {
+    for (let r=1; r<=12; r++) {
       const btn = document.createElement('div');
       btn.className = 'rank-btn'+(p.rank===r?' on':'');
       btn.innerHTML = `<div class="rank-num">${r}</div><div class="rank-sfx">위</div>`;
@@ -437,10 +437,10 @@ function save(i) {
 
 function renderDist() {
   const wrap = document.getElementById('rank-dist'); wrap.innerHTML='';
-  const counts = Array(8).fill(0);
+  const counts = Array(12).fill(0);
   P.filter(p=>p.done).forEach(p => { if(p.rank>=1&&p.rank<=8) counts[p.rank-1]++; });
   const max = Math.max(...counts, 1);
-  for (let r=1; r<=8; r++) {
+  for (let r=1; r<=12; r++) {
     const n = counts[r-1];
     const h = Math.round((n/max)*36)+2;
     const cell = document.createElement('div'); cell.className='dist-cell';
@@ -460,7 +460,7 @@ function renderSumCards() {
 
 function renderActGrid() {
   const wrap = document.getElementById('act-rank-grid'); if(wrap.children.length) return;
-  for (let r=1; r<=8; r++) {
+  for (let r=1; r<=12; r++) {
     const btn = document.createElement('div'); btn.className='act-rank-btn'; btn.id='ar'+r;
     btn.innerHTML=`<div class="rank-num">${r}</div><div class="rank-sfx" style="font-size:10px;color:var(--text-faint)">위</div>`;
     btn.onclick = () => setActRank(r);
